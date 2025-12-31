@@ -133,6 +133,8 @@ class NetworkAutoMounter(GObject.GObject, Nautilus.MenuProvider):
         files = args[-1]
         if not files or len(files) != 1 or not files[0].is_directory(): return []
         uri = files[0].get_uri().rstrip('/')
+        if not uri.startswith(('smb://', 'sftp://', 'ftp://', 'dav://', 'davs://')):
+            return []
         matched_bookmark = self.is_fuzzy_match(uri)
 
         if matched_bookmark:
@@ -149,6 +151,8 @@ class NetworkAutoMounter(GObject.GObject, Nautilus.MenuProvider):
             return []
 
         uri = folder.get_uri().rstrip('/')
+        if not uri.startswith(('smb://', 'sftp://', 'ftp://', 'dav://', 'davs://')):
+            return []
         matched_bookmark = self.is_fuzzy_match(uri)
 
         if matched_bookmark:
