@@ -134,11 +134,27 @@ class NetworkAutoMounter(GObject.GObject, Nautilus.MenuProvider):
         if not files or len(files) != 1 or not files[0].is_directory(): return []
         uri = files[0].get_uri().rstrip('/')
         matched_bookmark = self.is_fuzzy_match(uri)
-        
+
         if matched_bookmark:
             is_enabled = self.prefs.get(matched_bookmark, False)
             label = "Disable Auto-mount" if is_enabled else "Enable Auto-mount"
             item = Nautilus.MenuItem(name="NetworkAutoMounter::Toggle", label=label)
+            item.connect("activate", self.toggle_automount, matched_bookmark)
+            return [item]
+        return []
+
+    def get_background_items(self, *args):
+        folder = args[-1]
+        if not folder:
+            return []
+
+        uri = folder.get_uri().rstrip('/')
+        matched_bookmark = self.is_fuzzy_match(uri)
+
+        if matched_bookmark:
+            is_enabled = self.prefs.get(matched_bookmark, False)
+            label = "Disable Auto-mount" if is_enabled else "Enable Auto-mount"
+            item = Nautilus.MenuItem(name="NetworkAutoMounter::BackgroundToggle", label=label)
             item.connect("activate", self.toggle_automount, matched_bookmark)
             return [item]
         return []

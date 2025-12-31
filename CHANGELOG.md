@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Build 20251231-2] - 2025-12-31
+
+### Added
+- Right-click menu now appears when clicking on blank space inside a network share folder
+
 ## [Build 20251231] - 2025-12-31
 
 ### Added
