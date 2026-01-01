@@ -48,10 +48,16 @@ def mount_all():
         except: pass
     return True
 
+def on_network_changed(monitor, available):
+    if available:
+        mount_all()
+
 if __name__ == "__main__":
     mount_all()
     loop = GLib.MainLoop()
-    GLib.timeout_add_seconds(60, mount_all)
+    GLib.timeout_add_seconds(300, mount_all)
+    monitor = Gio.NetworkMonitor.get_default()
+    monitor.connect("network-changed", on_network_changed)
     loop.run()
 """
 

@@ -2,10 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Build 20251231-3] - 2025-12-31
+## [Build 20260101] - 2026-01-01
 
 ### Added
 - Right-click menu now appears when clicking on blank space inside a network share folder
+- Network change detection using Gio.NetworkMonitor to trigger mounts immediately when connectivity changes
+
+### Changed
+- Polling interval increased from 60 seconds to 300 seconds (5 minutes) since network monitoring now handles immediate triggers
 
 ### Fixed
 - Menu items now only appear when inside network share locations (smb, sftp, ftp, dav, davs)
