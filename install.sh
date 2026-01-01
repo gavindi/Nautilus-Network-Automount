@@ -48,7 +48,7 @@ def headless_uninstall():
         subprocess.run(["systemctl", "--user", "disable", "network-automount.service"],
                       stderr=subprocess.DEVNULL)
 
-        files_to_remove = [EXTENSION_FILE, SERVICE_SCRIPT, SYSTEMD_UNIT, PREFS_FILE]
+        files_to_remove = [EXTENSION_FILE, SERVICE_SCRIPT, SYSTEMD_UNIT]
         for f in files_to_remove:
             if os.path.exists(f):
                 os.remove(f)
@@ -171,7 +171,7 @@ def run_gui():
                 subprocess.run(["systemctl", "--user", "disable", "network-automount.service"],
                               stderr=subprocess.DEVNULL)
 
-                files_to_remove = [EXTENSION_FILE, SERVICE_SCRIPT, SYSTEMD_UNIT, PREFS_FILE]
+                files_to_remove = [EXTENSION_FILE, SERVICE_SCRIPT, SYSTEMD_UNIT]
                 for f in files_to_remove:
                     if os.path.exists(f):
                         os.remove(f)

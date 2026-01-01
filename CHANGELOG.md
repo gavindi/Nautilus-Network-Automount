@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Build 20260102] - 2026-01-02
+
+### Added
+- Automatic symbolic link creation in ~/Network Files for mounted network shares
+- Links are named in the format "[Share_Name] on [Server_Name]" for easy identification
+
+### Changed
+- Preferences file is now preserved on uninstall to retain user settings across reinstalls
+
 ## [Build 20260101] - 2026-01-01
 
 ### Added

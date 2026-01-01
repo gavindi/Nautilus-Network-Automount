@@ -22,11 +22,13 @@ SERVICE_SCRIPT_CONTENT = """#!/usr/bin/env python3
 import os
 import json
 import gi
+import urllib.parse
 gi.require_version('Gio', '2.0')
 from gi.repository import Gio, GLib
 
 PREFS_FILE = os.path.expanduser("~/.local/share/nautilus-python/automount_prefs.json")
 BOOKMARKS_FILE = os.path.expanduser("~/.config/gtk-3.0/bookmarks")
+NETWORK_MOUNTS_DIR = os.path.expanduser("~/Network Files")
 
 def get_enabled_bookmarks():
     enabled_uris = []
@@ -40,12 +42,77 @@ def get_enabled_bookmarks():
                 if prefs.get(uri): enabled_uris.append(uri)
     return enabled_uris
 
+def parse_uri(uri):
+    \"\"\"Parse a network URI and return (scheme, server, share).\"\"\"
+    parsed = urllib.parse.urlparse(uri)
+    scheme = parsed.scheme
+    server = parsed.hostname or ""
+    # The share is the first path component
+    path_parts = parsed.path.strip('/').split('/')
+    share = path_parts[0] if path_parts else ""
+    return scheme, server, share
+
+def get_gvfs_mount_path(scheme, server, share):
+    \"\"\"Get the gvfs mount path for a network share.\"\"\"
+    uid = os.getuid()
+    if scheme == 'smb':
+        return f"/run/user/{uid}/gvfs/smb-share:server={server},share={share}"
+    elif scheme == 'sftp':
+        return f"/run/user/{uid}/gvfs/sftp:host={server}"
+    elif scheme == 'ftp':
+        return f"/run/user/{uid}/gvfs/ftp:host={server}"
+    elif scheme in ('dav', 'davs'):
+        return f"/run/user/{uid}/gvfs/{scheme}:host={server}"
+    return None
+
+def create_symlink(uri):
+    \"\"\"Create a symlink in ~/Network Mounts for a mounted share.\"\"\"
+    scheme, server, share = parse_uri(uri)
+    if not server:
+        return
+
+    gvfs_path = get_gvfs_mount_path(scheme, server, share)
+    if not gvfs_path or not os.path.exists(gvfs_path):
+        return
+
+    os.makedirs(NETWORK_MOUNTS_DIR, exist_ok=True)
+
+    # Create link name: "[Share_Name] on [Server_Name]"
+    if share:
+        link_name = f"{share} on {server}"
+    else:
+        link_name = f"{scheme} on {server}"
+
+    link_path = os.path.join(NETWORK_MOUNTS_DIR, link_name)
+
+    # Remove existing symlink if it exists
+    if os.path.islink(link_path):
+        os.unlink(link_path)
+    elif os.path.exists(link_path):
+        return  # Don't overwrite non-symlink files
+
+    try:
+        os.symlink(gvfs_path, link_path)
+    except OSError:
+        pass
+
+def mount_callback(source, result, uri):
+    \"\"\"Callback after mount attempt completes.\"\"\"
+    try:
+        source.mount_enclosing_volume_finish(result)
+    except:
+        pass
+    # Try to create symlink regardless (mount may already exist)
+    GLib.timeout_add_seconds(2, lambda: create_symlink(uri) or False)
+
 def mount_all():
     for uri in get_enabled_bookmarks():
         try:
             f = Gio.File.new_for_uri(uri)
-            f.mount_enclosing_volume(Gio.MountMountFlags.NONE, None, None, None, None)
-        except: pass
+            f.mount_enclosing_volume(Gio.MountMountFlags.NONE, None, None, mount_callback, uri)
+        except:
+            # Mount may already exist, try creating symlink anyway
+            create_symlink(uri)
     return True
 
 def on_network_changed(monitor, available):
