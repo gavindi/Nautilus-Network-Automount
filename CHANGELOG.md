@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Build 20260103] - 2026-01-03
+
+### Changed
+- Reduced code duplication by extracting shared menu item logic into helper method
+- Added mtime-based caching for bookmark file reads to reduce I/O
+- Replaced bare except clauses with specific exception types for better error handling
+- Service restart now runs in background to avoid blocking Nautilus UI
+- Optimized string splitting with early termination (`split(' ', 1)`)
+- Service script now uses file monitoring for preferences instead of polling
+- Increased fallback polling interval from 300s to 600s (file monitoring handles immediate changes)
+- Added `@lru_cache` decorator to URI parsing for repeated lookups
+- Replaced if/elif chain with dictionary lookup for GVFS mount paths
+
+### Fixed
+- Potential silent failures from overly broad exception handling
+
 ## [Build 20260102] - 2026-01-02
 
 ### Added

@@ -9,7 +9,7 @@ The extension automatically creates all required files on first load:
 | File | Path | Responsibility |
 | :--- | :--- | :--- |
 | **Extension** | `~/.local/share/nautilus-python/extensions/network-automount.py` | Adds "Enable/Disable Auto-mount" to the Nautilus right-click menu. Self-installs the service components below. |
-| **Service Script** | `~/.local/bin/network-automount-service.py` | The background engine that mounts shares and creates symbolic links. Runs every 5 minutes and on network changes. (Auto-generated) |
+| **Service Script** | `~/.local/bin/network-automount-service.py` | The background engine that mounts shares and creates symbolic links. Responds to preference changes, network changes, and polls every 10 minutes as fallback. (Auto-generated) |
 | **Systemd Unit** | `~/.config/systemd/user/network-automount.service` | Ensures the service starts at login without a GUI. (Auto-generated) |
 | **Preferences** | `~/.local/share/nautilus-python/automount_prefs.json` | Stores which bookmarks are currently enabled. (Auto-generated) |
 | **Network Files** | `~/Network Files/` | Contains symbolic links to mounted network shares, named "[Share_Name] on [Server_Name]". (Auto-generated) |
@@ -61,7 +61,7 @@ Bookmark a Share: Add a network share (e.g., smb://stornado.local/share2) to you
 
 Enable Auto-mount: Right-click the folder in Nautilus and select "Enable Auto-mount".
 
-Background Persistence: The service will keep this share mounted, checking every 5 minutes and whenever network connectivity changes.
+Background Persistence: The service will keep this share mounted, responding immediately to preference and network changes (with a 10-minute fallback poll).
 
 Access via ~/Network Files: Mounted shares are automatically linked in your home folder under `~/Network Files/` with friendly names like "share2 on stornado.local".
 
