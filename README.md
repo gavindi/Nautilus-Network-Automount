@@ -2,6 +2,8 @@
 
 A self-installing Nautilus extension for GNOME that allows users to toggle background auto-mounting for network shares (SMB, SFTP, FTP, etc.) directly from the file manager.
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P21M7MBS)
+
 ## 🏗️ File Architecture
 
 The extension automatically creates all required files on first load:
